@@ -3,38 +3,45 @@ import { Role, ArnPrincipal, PolicyStatement, PolicyDocument, Effect, Condition,
 
 
 export class BedfinderIamStack extends cdk.Stack {
- 
+  
+  props?: cdk.StackProps
+
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
     //blub
+    
+    this.props = props;
 
-    this.createAwsAdminRoleAssets(props);
-    this.createDevOpsRoleAssets(props);
-    this.createPipelineUserAssets(props);
+    this.createAwsAdminRoleAssets();
+    //this.createDevOpsRoleAssets();
+    //this.createPipelineUserAssets();
 
   }
 
 
-  createPipelineUserAssets(props?:cdk.StackProps){
+  createPipelineUserAssets(){
     new User(this,"PipelineUser",{userName:"PipelineUser"})    
   }
 
-  createAwsAdminRoleAssets(props?:cdk.StackProps) {
+  createAwsAdminRoleAssets() {
     const adminRole = this.createAwsAdminRole();
-    const adminPolicies = this.createAdminPolicies()
+    // const adminPolicies = this.createAdminPolicies()
 
-    adminPolicies.forEach(adminPolicy => {
-      adminRole.addToPolicy(adminPolicy)
-    })    
+    // adminPolicies.forEach(adminPolicy => {
+    //   adminRole.addToPolicy(adminPolicy)
+    // })    
   
   }
 
   createAdminPolicies():PolicyStatement[]{
     const adminPolicies = []
 
+    const martin = new ArnPrincipal(`arn:aws:iam::${this.props?.env?.account}:user/martin`)
+    const sebastian = new ArnPrincipal(`arn:aws:iam::${this.props?.env?.account}:user/sebastian`)
+
+
     const allowAssignRole = new PolicyStatement({
       effect: Effect.ALLOW,
-      principals: [new ArnPrincipal(`arn:aws:iam::123:root}`)],
       actions: ["sts:AssumeRole"],
       conditions: [{"Bool": {"aws:MultiFactorAuthPresent": "true"}}]
     })
@@ -44,18 +51,17 @@ export class BedfinderIamStack extends cdk.Stack {
     return adminPolicies
   }
 
-  createAwsAdminRole(props?:cdk.StackProps):Role{
+  createAwsAdminRole():Role{
     return new Role(this, "BedfinderAWSAdminRole", { 
-        assumedBy: new ArnPrincipal(`arn:aws:iam::${props?.env?.account}:root}`) ,
+        assumedBy: new ArnPrincipal(`arn:aws:iam::${this.props?.env?.account}:root`) ,
         roleName: "AwsAdmin" 
     })
   }
 
 
-  createDevOpsRoleAssets(props?:cdk.StackProps){
+  createDevOpsRoleAssets(){
     const devOpsRole = this.createDevOpsRole();
     const devOpsPolicies = this.createDevOpsPolicies()
-
     devOpsPolicies.forEach(devOpsPolicy => {
       devOpsRole.addToPolicy(devOpsPolicy)
     })    
@@ -66,7 +72,7 @@ export class BedfinderIamStack extends cdk.Stack {
 
     const allowAssignRole = new PolicyStatement({
       effect: Effect.ALLOW,
-      principals: [new ArnPrincipal(`arn:aws:iam::12314:root}`)],
+      principals: [new ArnPrincipal(`arn:aws:iam::${this.props?.env?.account}:martin`)],
       actions: ["sts:AssumeRole"],
       conditions: [{"Bool": {"aws:MultiFactorAuthPresent": "true"}}]
     })
@@ -76,9 +82,9 @@ export class BedfinderIamStack extends cdk.Stack {
     return devOpsPolicies
   }
 
-  createDevOpsRole(props?:cdk.StackProps):Role{
+  createDevOpsRole():Role{
     return new Role(this, "BedfinderDevOpsRole", { 
-        assumedBy: new ArnPrincipal(`arn:aws:iam::${props?.env?.account}:root}`) ,
+        assumedBy: new ArnPrincipal(`arn:aws:iam::${this.props?.env?.account}:root`) ,
         roleName: "AwsDevOps" 
     })
   }

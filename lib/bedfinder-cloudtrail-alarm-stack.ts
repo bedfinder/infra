@@ -20,9 +20,8 @@ export class BedfinderCloudtrailAlarmStack extends cdk.Stack {
         const alarmTopic = this.createAlarmTopic()
 
         this.createCloudwatchMetricsFilter(cloudtrailLogGroup,rootAccountUsageCount)
-
         this.createRootAccessAlarm(rootAccountUsageCount,alarmTopic);
-    
+        
       }
 
 
