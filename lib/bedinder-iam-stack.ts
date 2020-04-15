@@ -1,12 +1,12 @@
 import * as cdk from '@aws-cdk/core';
 import { Role, ArnPrincipal, PolicyStatement, PolicyDocument, Effect, Condition, User } from '@aws-cdk/aws-iam'
-
+import { BedfinderStackProbs }  from '../lib/bedfinder-props'
 
 export class BedfinderIamStack extends cdk.Stack {
   
-  props?: cdk.StackProps
+  props?: BedfinderStackProbs
 
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: cdk.Construct, id: string, props?: BedfinderStackProbs) {
     super(scope, id, props);
     //blub
     
@@ -14,7 +14,7 @@ export class BedfinderIamStack extends cdk.Stack {
 
     this.createAwsAdminRoleAssets();
     //this.createDevOpsRoleAssets();
-    //this.createPipelineUserAssets();
+    this.createPipelineUserAssets();
 
   }
 
@@ -52,9 +52,9 @@ export class BedfinderIamStack extends cdk.Stack {
   }
 
   createAwsAdminRole():Role{
-    return new Role(this, "BedfinderAWSAdminRole", { 
+    return new Role(this, `${this.props?.stage}-${this.props?.context}-Aws-Admin`, { 
         assumedBy: new ArnPrincipal(`arn:aws:iam::${this.props?.env?.account}:root`) ,
-        roleName: "AwsAdmin" 
+        roleName: `${this.props?.stage}-${this.props?.context}-Aws-Admin` 
     })
   }
 
@@ -83,9 +83,9 @@ export class BedfinderIamStack extends cdk.Stack {
   }
 
   createDevOpsRole():Role{
-    return new Role(this, "BedfinderDevOpsRole", { 
+    return new Role(this, `${this.props?.stage}-${this.props?.context}-Devops-Role`, { 
         assumedBy: new ArnPrincipal(`arn:aws:iam::${this.props?.env?.account}:root`) ,
-        roleName: "AwsDevOps" 
+        roleName: `${this.props?.stage}-${this.props?.context}-Devops-Role`
     })
   }
 

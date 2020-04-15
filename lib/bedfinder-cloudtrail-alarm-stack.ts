@@ -27,9 +27,11 @@ export class BedfinderCloudtrailAlarmStack extends cdk.Stack {
 
       createAlarmTopic():Topic{
         const alarmTopic = new Topic(this,"AlarmTopic",{topicName: "AlarmTopic", displayName:"AlarmTopic"})
-        new Subscription(this,"alarmTopicSubscription", {topic:alarmTopic, 
-                                                         protocol: SubscriptionProtocol.EMAIL,
-                                                         endpoint:"sebastian.sulzbacher@googlemail.com"})
+        new Subscription(this,"alarmTopicSubscriptionMail", {topic:alarmTopic, 
+                                                             protocol: SubscriptionProtocol.EMAIL,
+                                                             endpoint:"sebastian.sulzbacher@googlemail.com"})
+        
+
         return alarmTopic
 
       }
